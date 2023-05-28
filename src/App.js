@@ -13,13 +13,21 @@ function App() {
 	]);
 
 	const [title, setTitle] = useState('');
-	const bodyInputRef = useRef(); // доступ к дом элементу
+	const [body, setBody] = useState('');
 
 	const addNewPost = (e) => {
 		e.preventDefault();
-		console.log(title);
-		console.log(bodyInputRef.current.value); 	// выводится что вводили в поле
-		console.log(bodyInputRef.current); 			// выводится <input type="text">
+		const newPost = {
+			id: Date.now(),
+			title, 
+			body
+		}
+		setPosts([...posts, newPost]); 
+		// 1 аргумент разворачивает все посты
+		// 2 аргумент вставляет новые данные данные в 1 аргумент
+		setTitle('');
+		setBody('');
+
 	}
 
 
@@ -33,10 +41,9 @@ function App() {
 					type="text" 
 					placeholder="Название поста" 
 				/>
-				{/* Неуправляемый компонент */}
 				<MyInput 
-					ref={bodyInputRef}
-					type="text" 
+					value={body}
+					onChange={e => setBody(e.target.value)}
 					placeholder="Описание поста" />
 				<MyButton onClick={addNewPost}>Создать пост</MyButton>
 			</form>
