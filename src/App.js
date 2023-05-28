@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
 import './styles/App.css';
 import PostList from "./components/PostList";
@@ -13,10 +13,13 @@ function App() {
 	]);
 
 	const [title, setTitle] = useState('');
+	const bodyInputRef = useRef(); // доступ к дом элементу
 
 	const addNewPost = (e) => {
 		e.preventDefault();
-		console.log(title)
+		console.log(title);
+		console.log(bodyInputRef.current.value); 	// выводится что вводили в поле
+		console.log(bodyInputRef.current); 			// выводится <input type="text">
 	}
 
 
@@ -30,7 +33,11 @@ function App() {
 					type="text" 
 					placeholder="Название поста" 
 				/>
-				<MyInput type="text" placeholder="Описание поста" />
+				{/* Неуправляемый компонент */}
+				<MyInput 
+					ref={bodyInputRef}
+					type="text" 
+					placeholder="Описание поста" />
 				<MyButton onClick={addNewPost}>Создать пост</MyButton>
 			</form>
 			<PostList posts={posts} title='Посты про вебразработку' />	
