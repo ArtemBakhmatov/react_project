@@ -1,10 +1,9 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import './styles/App.css';
 import PostList from "./components/PostList";
 import PostForm from "./components/PostForm";
-import MySelect from "./components/UI/select/MySelect";
-import MyInput from "./components/UI/input/MyInput";
+import PostFilter from "./components/PostFilter";
 
 function App() {
 	const [posts, setPosts] = useState([
@@ -22,60 +21,32 @@ function App() {
 		setPosts(posts.filter(p => p.id !== post.id));
 	}
 
-	const [selectedSost, setSelectedSost] = useState('');
-	const [searchQuery, setSearchQuery] = useState('');
+	const [filter, setFilter] = useState({sort: '', query: ''});
 
 	const sortedPosts = useMemo(() => {
-		console.log('sdfjjsjfjl')
-		if (selectedSost) {
-			[...posts].sort((a, b) => a[selectedSost].localeCompare(b[selectedSost]));
+		console.log('sdfjjsjfjl');
+		if (filter.sort) {
+			[...posts].sort((a, b) => a[filter.sort].localeCompare(b[filter.sort]));
 		}
 		return posts;
-	}, [selectedSost, posts]);
+	}, [filter.sort, posts]);
 
 	const sortedAndSearchedPosts = useMemo(() => {
-		return sortedPosts.filter(post => post.title.toLocaleLowerCase().includes(searchQuery))
-	}, [searchQuery, sortedPosts]);
-
-	const sortPosts = (sort) => {
-		setSelectedSost(sort);	
-	};
+		return sortedPosts.filter(post => post.title.toLowerCase().includes(filter.query.toLowerCase()));
+	}, [filter.query, sortedPosts]);
 	
 
 	return (
 		<div className="App">
 			<PostForm create={createPost} />
 			<hr style={{margin: '15px 0'}} />
-			<div>
-				<MyInput
-					value={searchQuery}
-					onChange={e => setSearchQuery(e.target.value)}
-					placeholder='Поиск...'
-				/>
-				<MySelect
-					value={selectedSost}
-					onChange={sortPosts}
-					defaultValue='Сортировка'
-					options={[
-						{value: 'title', name: 'По названию'},
-						{value: 'body', name: 'По описанию'}
-					]}
-				/>
-			</div>
-			{sortedAndSearchedPosts.length !== 0
-				? 
-					<PostList remove={removePost} posts={sortedAndSearchedPosts} title='Посты про вебразработку' />
-				: 
-					<div 
-						style={{textAlign: 'center', fontWeight: "bold", fontSize: 18}}>
-							Посты не найдены!
-					</div>
-			}
-				
+			<PostFilter 
+				filter={filter} 
+				setFilter={setFilter} 
+			/>
+			<PostList remove={removePost} posts={sortedAndSearchedPosts} title='Посты про вебразработку' />	
 		</div>
 	);
-
-	// type='submit' нужен когда мы отправляем на сервер, сейчас он нам не нужен
 }
 
 export default App;

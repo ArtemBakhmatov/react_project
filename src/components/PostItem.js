@@ -16,7 +16,7 @@ const PostItem = (props) => {
                 <MyButton 
                     onClick={() => remove(post)} >
                         Удалить
-                    </MyButton>
+                </MyButton>
             </div>
         </div>
     );

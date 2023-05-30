@@ -3,6 +3,14 @@ import React from 'react';
 import PostItem from './PostItem';
 
 const PostList = ({remove, posts, title}) => {
+    if (!posts.length) {
+        return (
+            <div 
+			    style={{textAlign: 'center', fontWeight: "bold", fontSize: 18}}>
+                    Посты не найдены!
+            </div>
+        )
+    }
 
     return (
         <div>
