@@ -9,27 +9,21 @@ import MyButton from "./components/UI/button/MyButton";
 import { usePosts } from "./hook/usePosts";
 import PostService from "./API/PostService";
 import Loader from "./components/UI/loader/Loader";
+import { useFething } from "./hook/useFething";
 
 function App() {
 	const [posts, setPosts] = useState([]);
 	const [filter, setFilter] = useState({sort: '', query: ''});
 	const [modal, setModal] = useState(false);
 	const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query);
-	const [isPostLoading, setIsPostLoading] = useState(false);
+	const [fetchPosts, isPostLoading, postError] = useFething(async () => {
+		const posts = await PostService.getAll();
+			setPosts(posts);
+	});
 
 	const createPost = (newPost) => {
 		setPosts([...posts, newPost]);
 		setModal(false);
-	}
-
-	async function fetchPosts() {
-		setIsPostLoading(true);
-		setTimeout(async () => {
-			const posts = await PostService.getAll();
-			setPosts(posts);
-			setIsPostLoading(false);
-		}, 1000);
-		
 	}
 
 	// Получаем post из дочернего элемента	
@@ -57,6 +51,9 @@ function App() {
 				filter={filter} 
 				setFilter={setFilter} 
 			/>
+			{postError &&
+				<div>Произошла ошибка ${postError}</div>
+			}
 			{isPostLoading
 				? 
 					<div style={{display: 'flex', justifyContent: 'center', marginTop: 50}}>
