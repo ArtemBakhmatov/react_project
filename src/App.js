@@ -26,7 +26,7 @@ function App() {
 		pagesArray.push(i + 1);
 	}
 	console.log([pagesArray]);
-	const [fetchPosts, isPostLoading, postError] = useFething(async () => {
+	const [fetchPosts, isPostLoading, postError] = useFething(async (limit, page) => {
 		const response = await PostService.getAll(limit, page);
 			setPosts(response.data);
 			const totalCount = response.headers['x-total-count']; // общее кол-во постов
@@ -46,11 +46,12 @@ function App() {
 	}
 
 	useEffect(() => {
-		fetchPosts();
-	}, [page]);// [] -> если пустой массив, то сроботает один раз
+		fetchPosts(limit, page);
+	}, []);// [] -> если пустой массив, то сроботает один раз
 
 	const changePage = (page) => {
 		setPage(page);
+		fetchPosts(limit, page);
 	} 
 	
 	return (
