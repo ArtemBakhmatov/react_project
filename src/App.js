@@ -11,6 +11,7 @@ import PostService from "./API/PostService";
 import Loader from "./components/UI/loader/Loader";
 import { useFething } from "./hook/useFething";
 import { getPageCount, getPagesArray } from "./utils/pages";
+import Pagination from "./components/UI/pagination/Pagination";
 
 function App() {
 	const [posts, setPosts] = useState([]);
@@ -20,12 +21,8 @@ function App() {
 	const [totalPages, setTotalPages] = useState(0); 	// Обшее количество постов
 	const [limit, setLimit] = useState(10);				// Кол-во постов на одной странице
 	const [page, setPage] = useState(1);				// Первая страница
-	let pagesArray = getPagesArray(totalPages);
  
-	for (let i = 0; i < totalPages; i++) {
-		pagesArray.push(i + 1);
-	}
-	console.log([pagesArray]);
+	
 	const [fetchPosts, isPostLoading, postError] = useFething(async (limit, page) => {
 		const response = await PostService.getAll(limit, page);
 			setPosts(response.data);
@@ -81,17 +78,11 @@ function App() {
 				:
 					<PostList remove={removePost} posts={sortedAndSearchedPosts} title='Посты про вебразработку' />	
 			}
-			<div className="page__wrapper">
-				{pagesArray.map(p => 
-					<span 
-						key={p}
-						className={page === p ? 'page page__current' : 'page'}
-						onClick={() => changePage(p)}
-					>
-						{p}
-					</span>
-				)}
-			</div>
+			<Pagination 
+				page={page} 
+				changePage={changePage} 
+				totalPages={totalPages} 
+			/>
 		</div>
 	);
 }
