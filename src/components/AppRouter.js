@@ -1,19 +1,33 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-
-import About from "../pages/About";
-import Posts from "../pages/Posts";
-import Error from "../pages/Error";
-import PostIdPage from '../pages/PostIdPage';
+import { privateRoutes, publicRoutes } from '../router';
 
 const AppRouter = () => {
+    const isAuth = false;
     return (
         <Routes>
-            <Route path='/about' element={<About />} />
-            <Route exact path='/posts' element={<Posts />} />
-            <Route exact path='/posts/:id' element={<PostIdPage />} />
-            <Route path='/*' element={<Error />} />
-        </Routes>
+            {isAuth 
+                ?
+                    privateRoutes.map(route => 
+                        <Route 
+                            key={route.path}
+                            path={route.path} 
+                            element={<route.component />} 
+                            exact={route.exact}
+                        /> 
+                    )
+                :
+                    publicRoutes.map(route => 
+                        <Route 
+                            key={route.path}
+                            path={route.path} 
+                            element={<route.component />} 
+                            exact={route.exact}
+                        /> 
+                    )
+            }
+        </Routes>  
+        
     );
 };
 // exact нужен для того что бы роутер понимал что роуты все разные
