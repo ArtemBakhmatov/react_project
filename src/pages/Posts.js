@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import '../styles/App.css';
 import PostList from "../components/PostList";
@@ -21,16 +21,17 @@ function Posts() {
 	const [totalPages, setTotalPages] = useState(0); 	// Обшее количество постов
 	const [limit, setLimit] = useState(10);				// Кол-во постов на одной странице
 	const [page, setPage] = useState(1);				// Первая страница
+	const lastElement = useRef();
+	const observer = useRef();
+	console.log(lastElement);
  
 	
 	const [fetchPosts, isPostLoading, postError] = useFething(async (limit, page) => {
 		const response = await PostService.getAll(limit, page);
-			setPosts(response.data);
+			setPosts([...posts, ...response.data]);
 			const totalCount = response.headers['x-total-count']; // общее кол-во постов
 			setTotalPages(getPageCount(totalCount, limit));
 	});
-
-	console.log(totalPages);
 
 	const createPost = (newPost) => {
 		setPosts([...posts, newPost]);
@@ -43,12 +44,26 @@ function Posts() {
 	}
 
 	useEffect(() => {
+		if (isPostLoading) return;
+		if (observer.current) observer.current.disconnect();
+		let callback = function(entries, observer) {
+			if (entries[0].isIntersecting && page < totalPages) {
+				console.log(page);
+				setPage(page + 1);
+			}
+			console.log(entries);
+			
+		}
+		observer.current = new IntersectionObserver(callback);
+		observer.current.observe(lastElement.current)
+	}, [isPostLoading])
+
+	useEffect(() => {
 		fetchPosts(limit, page);
-	}, []);// [] -> если пустой массив, то сроботает один раз
+	}, [page]);// [] -> если пустой массив, то сроботает один раз
 
 	const changePage = (page) => {
 		setPage(page);
-		fetchPosts(limit, page);
 	} 
 	
 	return (
@@ -70,13 +85,15 @@ function Posts() {
 			{postError &&
 				<div>Произошла ошибка ${postError}</div>
 			}
-			{isPostLoading
-				? 
-					<div style={{display: 'flex', justifyContent: 'center', marginTop: 50}}>
-						<Loader />
-					</div>
-				:
-					<PostList remove={removePost} posts={sortedAndSearchedPosts} title='Посты про вебразработку' />	
+			<PostList remove={removePost} posts={sortedAndSearchedPosts} title='Посты про вебразработку' />	
+			<div 
+				ref={lastElement} 
+				style={{height: '20px', background: 'red'}}>	
+			</div>
+			{isPostLoading &&
+				<div style={{display: 'flex', justifyContent: 'center', marginTop: 50}}>
+					<Loader />
+				</div>
 			}
 			<Pagination 
 				page={page} 

@@ -6,7 +6,6 @@ const PostItem = (props) => {
     const {title, body} = props.post;
     const {number, remove, post} = props;
     const router = useNavigate();
-    console.log(router);
     return (
         <div className="post">
             <div className="post__content">
